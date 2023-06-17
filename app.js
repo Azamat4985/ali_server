@@ -187,6 +187,7 @@ app.post("/hasPhoto", (req, res) => {
   fs.readdir(path.join(__dirname, "/photos/" + id), function (err, files) {
     if (err) {
       console.log(err);
+        res.send({ hasPhoto: false });
     } else {
       if (files.length == 0) {
         res.send({ hasPhoto: false });
