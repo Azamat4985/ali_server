@@ -466,7 +466,7 @@ app.post("/findMatching", async (req, res) => {
       .then(async (posts) => {
         for (const post of posts) {
           if (post._id != matchingFor) {
-            if (matchingFor.ex_type == post.type) {
+            if (matchingFor.ex_type == post.type && (matchingFor.ex_price_from <= post.price && matchingFor.ex_price_to >= post.price)) {
               let checkResult = check(matchingFor, post);
               console.log(checkResult);
               if (checkResult.ok) {
@@ -559,7 +559,7 @@ function check(initial, second) {
             score++;
             matches.push("Жилой комплекс");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             matches.push("Год постройки");
             score++;
           }
@@ -567,7 +567,7 @@ function check(initial, second) {
             score++;
             matches.push("Класс ЖК");
           }
-          if (initial.ex_rooms != second.rooms) {
+          if (initial.ex_rooms_from <= second.rooms && initial.ex_rooms_to >= second.rooms) {
             return { ok: false, score: score, type: initial.ex_type, reason: "rooms" };
           } else {
             matches.push("Кол-во комнат");
@@ -616,7 +616,7 @@ function check(initial, second) {
             score++;
             matches.push("Жилой комплекс");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             matches.push("Год постройки");
             score++;
           }
@@ -664,7 +664,7 @@ function check(initial, second) {
             score++;
             matches.push("Район");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             matches.push("Год постройки");
             score++;
           }
@@ -676,6 +676,10 @@ function check(initial, second) {
           }
           if (initial.ex_purpose == second.purpose) {
             matches.push("Назначение");
+            score++;
+          }
+          if (initial.ex_any_buildings == second.any_buildings) {
+            matches.push("Наличие построек");
             score++;
           }
           if (initial.ex_pdp == second.pdp) {
@@ -704,11 +708,11 @@ function check(initial, second) {
             score++;
             matches.push("Район");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             score++;
             matches.push("Год постройки");
           }
-          if (initial.ex_rooms != second.rooms) {
+          if (initial.ex_rooms_from <= second.rooms && initial.ex_rooms_to >= second.rooms) {
             return { ok: false, score: score, type: initial.ex_type, reason: "rooms" };
           } else {
             matches.push("Кол-во комнат");
@@ -720,7 +724,7 @@ function check(initial, second) {
           } else {
             return { ok: false, score: score };
           }
-          if (initial.ex_height == second.height) {
+          if (initial.ex_height_from <= second.height && initial.ex_height_to >= second.height) {
             matches.push("Высота потолков");
             score++;
           }
@@ -752,7 +756,7 @@ function check(initial, second) {
             score++;
             matches.push("Район");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             matches.push("Год постройки");
             score++;
           }
@@ -809,7 +813,7 @@ function check(initial, second) {
             score++;
             matches.push("Район");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             score++;
             matches.push("Год постройки");
           }
@@ -827,16 +831,9 @@ function check(initial, second) {
             matches.push("Участок (сот)");
             score++;
           }
-          if (initial.ex_performance_from <= second.performance && initial.ex_performance_to >= second.performance) {
-            matches.push("Производительность");
+          if (initial.ex_production.trim().toLowerCase() == second.production.trim().toLowerCase()) {
+            matches.push("Производство");
             score++;
-          } else {
-            return {
-              ok: false,
-              score: score,
-              type: initial.ex_type,
-              reason: "performance",
-            };
           }
           if (initial.ex_mobility == second.mobility) {
             score++;
@@ -906,7 +903,7 @@ function check(initial, second) {
             score++;
             matches.push("Район");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             score++;
             matches.push("Год постройки");
           }
@@ -955,7 +952,7 @@ function check(initial, second) {
             score++;
             matches.push("Район");
           }
-          if (initial.ex_built_year == null || (initial.ex_built_year + 3 >= second.built_year && initial.ex_built_year - 3 <= second.built_year)) {
+          if (initial.ex_built_year_from <= second.built_year && initial.ex_built_year_to >= second.built_year) {
             score++;
             matches.push("Год постройки");
           }
