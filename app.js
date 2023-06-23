@@ -187,7 +187,7 @@ app.post("/hasPhoto", (req, res) => {
   fs.readdir(path.join(__dirname, "/photos/" + id), function (err, files) {
     if (err) {
       console.log(err);
-        res.send({ hasPhoto: false });
+      res.send({ hasPhoto: false });
     } else {
       if (files.length == 0) {
         res.send({ hasPhoto: false });
@@ -270,51 +270,56 @@ app.post("/getPostItem", (req, res) => {
 
 app.post("/updatePost", (req, res) => {
   let fields = JSON.parse(req.body.fields);
+  delete fields.name;
   new Promise(function (resolve, reject) {
     if (fs.existsSync("photos/" + req.body.id)) {
       fs.rm("photos/" + req.body.id, { recursive: true }, (err) => {
         if (err) {
           throw err;
         }
-        resolve();
       });
     }
+    resolve();
   }).then(() => {
     Post.findByIdAndUpdate(req.body.id, { $set: { ...fields } }).then((response) => {});
-    new Promise(function (resolve, reject) {
-      let passData = {};
-      let id = req.body.id;
+    let files = req.files;
+    if (files != null) {
+      new Promise(function (resolve, reject) {
+        let passData = {};
+        let id = req.body.id;
 
-      fs.mkdirSync("photos/" + id);
-      let files = req.files;
-      let photos_path = [];
-      let mainPhoto_path = "";
-      for (const key in files) {
-        let file = files[key];
-        let fileName = file.name;
-        fileName = fileName.split(".");
-        file.mv(`photos/${id}/` + `${fileName[0]}.jpg`, (err) => {});
-        if (fileName[0] == "main") {
-          mainPhoto_path = `photos/${id}/main.jpg`;
-        } else {
-          photos_path.push(`photos/${id}/${fileName[0]}.jpg`);
+        fs.mkdirSync("photos/" + id);
+        let photos_path = [];
+        let mainPhoto_path = "";
+        for (const key in files) {
+          let file = files[key];
+          let fileName = file.name;
+          fileName = fileName.split(".");
+          file.mv(`photos/${id}/` + `${fileName[0]}.jpg`, (err) => {});
+          if (fileName[0] == "main") {
+            mainPhoto_path = `photos/${id}/main.jpg`;
+          } else {
+            photos_path.push(`photos/${id}/${fileName[0]}.jpg`);
+          }
         }
-      }
-      passData.photos_path = photos_path;
-      passData.mainPhoto_path = mainPhoto_path;
+        passData.photos_path = photos_path;
+        passData.mainPhoto_path = mainPhoto_path;
 
-      // extras to DB
+        // extras to DB
 
-      resolve(passData);
-    }).then((data) => {
-      let id = req.body.id;
-      Post.findByIdAndUpdate(id, {
-        mainPhoto_path: data.mainPhoto_path,
-        photos_path: data.photos_path,
-      }).then((response1) => {
-        res.send({ info: "updated" });
+        resolve(passData);
+      }).then((data) => {
+        let id = req.body.id;
+        Post.findByIdAndUpdate(id, {
+          mainPhoto_path: data.mainPhoto_path,
+          photos_path: data.photos_path,
+        }).then((response1) => {
+          res.send({ info: "updated" });
+        });
       });
-    });
+    } else {
+      res.send({ info: "updated" });
+    }
   });
 });
 
@@ -466,7 +471,7 @@ app.post("/findMatching", async (req, res) => {
       .then(async (posts) => {
         for (const post of posts) {
           if (post._id != matchingFor) {
-            if (matchingFor.ex_type == post.type && (matchingFor.ex_price_from <= post.price && matchingFor.ex_price_to >= post.price)) {
+            if (matchingFor.ex_type == post.type && matchingFor.ex_price_from <= post.price && matchingFor.ex_price_to >= post.price) {
               let checkResult = check(matchingFor, post);
               console.log(checkResult);
               if (checkResult.ok) {
