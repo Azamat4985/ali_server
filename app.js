@@ -13,6 +13,7 @@ import {Post} from "./models/post.js";
 import {User} from "./models/user.js";
 import {Chain} from "./models/chain.js";
 import {GeneratedChain} from "./models/generatedChain.js";
+import { log } from "console";
 
 const db = "mongodb+srv://aligroup:XyGGrOoHnnETTCGe@cluster0.00i6crk.mongodb.net/aligroup?retryWrites=true&w=majority";
 mongoose
@@ -390,7 +391,6 @@ app.post("/getExchange", (req, res) => {
                                 }
                                 if (!duplicate_found) {
                                     let checkState = check(initial, second);
-                                    console.log(checkState);
                                     let data_obj = {};
                                     if (checkState.ok) {
                                         data_obj.initial_matches = checkState.matches;
@@ -1209,8 +1209,12 @@ function check(initial, second) {
             break;
 
         default:
+            return {ok: false }
             break;
     }
+
+    console.log(!!initial.ex_type)
+    return {ok:false}
 }
 
 app.listen(port, () => console.log("> Server is up and running on port : " + port));
