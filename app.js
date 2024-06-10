@@ -738,6 +738,8 @@ async function findTree(allObjects, parentId, iteration, firstParent) {
                 childNode.children = null
             }
         }
+    } else {
+        return null;
     }
 
     return node.children;
@@ -748,7 +750,7 @@ async function findChildren(allObjects, parentId) {
 
     let children = [];
     for (const object of allObjects) {
-        if (parent._id != object._id && !object.booked_by) {
+        if (parent._id != object._id) { // && !object.booked_by
             if (parent.ex_type == object.type && parent.ex_price_from <= object.price && parent.ex_price_to >= object.price) {
                 let checkResult = check(parent, object);
                 if (checkResult.ok) {
@@ -1212,8 +1214,6 @@ function check(initial, second) {
             return {ok: false }
             break;
     }
-
-    console.log(!!initial.ex_type)
     return {ok:false}
 }
 
